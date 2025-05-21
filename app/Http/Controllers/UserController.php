@@ -21,7 +21,7 @@ class UserController extends Controller
                 $users = User::where('parent_id', parentId())->where('type', 'owner')->get();
                 return view('user.index', compact('users'));
             } else {
-                $users = User::where('parent_id', '=', parentId())->whereNotIn('type', ['tenant', 'maintainer'])->get();
+                $users = User::where('parent_id', '=', parentId())->whereNotIn('type', ['client', 'maintainer'])->get();
                 return view('user.index', compact('users'));
             }
         } else {
@@ -32,7 +32,7 @@ class UserController extends Controller
 
     public function create()
     {
-        $userRoles = Role::where('parent_id', parentId())->whereNotIn('name', ['tenant', 'maintainer'])->get()->pluck('name', 'id');
+        $userRoles = Role::where('parent_id', parentId())->whereNotIn('name', ['client', 'maintainer'])->get()->pluck('name', 'id');
         return view('user.create', compact('userRoles'));
     }
 
@@ -171,7 +171,7 @@ class UserController extends Controller
     public function edit($id)
     {
         $user = User::findOrFail($id);
-        $userRoles = Role::where('parent_id', '=', parentId())->whereNotIn('name', ['tenant', 'maintainer'])->get()->pluck('name', 'id');
+        $userRoles = Role::where('parent_id', '=', parentId())->whereNotIn('name', ['client', 'maintainer'])->get()->pluck('name', 'id');
 
         return view('user.edit', compact('user', 'userRoles'));
     }

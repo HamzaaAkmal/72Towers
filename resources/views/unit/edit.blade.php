@@ -19,30 +19,30 @@
             {{Form::number('baths',null,array('class'=>'form-control','placeholder'=>__('Enter number of bath')))}}
         </div>
         <div class="form-group  col-md-6">
-            {{Form::label('rent',__('Rent'),array('class'=>'form-label'))}}
-            {{Form::number('rent',null,array('class'=>'form-control','placeholder'=>__('Enter unit rent')))}}
+            {{Form::label('amount_due',__('Amount Due'),array('class'=>'form-label'))}}
+            {{Form::number('amount_due',null,array('class'=>'form-control','placeholder'=>__('Enter unit amount due')))}}
         </div>
         <div class="form-group col-md-6">
-            {{Form::label('rent_type',__('Rent Type'),array('class'=>'form-label'))}}
-            {{Form::select('rent_type',$rentTypes,null,array('class'=>'form-control hidesearch','id'=>'rent_type'))}}
+            {{Form::label('charge_type',__('Charge Type'),array('class'=>'form-label'))}}
+            {{Form::select('charge_type',$chargeTypes,null,array('class'=>'form-control hidesearch','id'=>'charge_type'))}}
         </div>
-        <div class="form-group  col-md-12 rent_type monthly ">
-            {{Form::label('rent_duration',__('Rent Duration'),array('class'=>'form-label'))}}
-            {{Form::number('rent_duration',null,array('class'=>'form-control','placeholder'=>__('Enter day of month between 1 to 30')))}}
+        <div class="form-group  col-md-12 charge_type monthly ">
+            {{Form::label('charge_duration',__('Charge Duration'),array('class'=>'form-label'))}}
+            {{Form::number('charge_duration',null,array('class'=>'form-control','placeholder'=>__('Enter day of month between 1 to 30')))}}
         </div>
-        <div class="form-group  col-md-12 rent_type yearly d-none">
-            {{Form::label('rent_duration',__('Rent Duration'),array('class'=>'form-label'))}}
-            {{Form::number('rent_duration',null,array('class'=>'form-control','placeholder'=>__('Enter month of year between 1 to 12'),'disabled'))}}
+        <div class="form-group  col-md-12 charge_type yearly d-none">
+            {{Form::label('charge_duration',__('Charge Duration'),array('class'=>'form-label'))}}
+            {{Form::number('charge_duration',null,array('class'=>'form-control','placeholder'=>__('Enter month of year between 1 to 12'),'disabled'))}}
         </div>
-        <div class="form-group  col-md-4 rent_type custom d-none">
+        <div class="form-group  col-md-4 charge_type custom d-none">
             {{Form::label('start_date',__('Start Date'),array('class'=>'form-label'))}}
             {{Form::date('start_date',null,array('class'=>'form-control','disabled'))}}
         </div>
-        <div class="form-group  col-md-4 rent_type custom d-none">
+        <div class="form-group  col-md-4 charge_type custom d-none">
             {{Form::label('end_date',__('End Date'),array('class'=>'form-label'))}}
             {{Form::date('end_date',null,array('class'=>'form-control','disabled'))}}
         </div>
-        <div class="form-group  col-md-4 rent_type custom d-none">
+        <div class="form-group  col-md-4 charge_type custom d-none">
             {{Form::label('payment_due_date',__('Payment Due Date'),array('class'=>'form-label'))}}
             {{Form::date('payment_due_date',null,array('class'=>'form-control','disabled'))}}
         </div>
@@ -78,18 +78,18 @@
 </div>
 {{ Form::close() }}
 <script>
-    $('#rent_type').on('change', function() {
+    $('#charge_type').on('change', function() {
         "use strict";
         var type=this.value;
-        $('.rent_type').addClass('d-none')
+        $('.charge_type').addClass('d-none')
         $('.'+type).removeClass('d-none')
 
-        var input1= $('.rent_type').find('input');
+        var input1= $('.charge_type').find('input');
         input1.prop('disabled', true);
         var input2= $('.'+type).find('input');
         input2.prop('disabled', false);
     });
-    $('#rent_type').trigger('change');
+    $('#charge_type').trigger('change');
 
 </script>
 

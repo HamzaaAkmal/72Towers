@@ -7,7 +7,7 @@ use App\Models\InvoiceItem;
 use App\Models\InvoicePayment;
 use App\Models\Notification;
 use App\Models\Property;
-use App\Models\Tenant;
+use App\Models\Client;
 use App\Models\Type;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -18,9 +18,9 @@ class InvoiceController extends Controller
     public function index()
     {
         if (\Auth::user()->can('manage invoice')) {
-            if (\Auth::user()->type == 'tenant') {
-                $tenant = Tenant::where('user_id', \Auth::user()->id)->first();
-                $invoices = Invoice::where('property_id', $tenant->property)->where('unit_id', $tenant->unit)->where('parent_id', parentId())->get();
+            if (\Auth::user()->type == 'client') {
+                $client = Client::where('user_id', \Auth::user()->id)->first();
+                $invoices = Invoice::where('property_id', $client->property)->where('unit_id', $client->unit)->where('parent_id', parentId())->get();
             } else {
                 $invoices = Invoice::where('parent_id', parentId())->get();
             }
@@ -91,14 +91,14 @@ class InvoiceController extends Controller
             $notification = Notification::where('parent_id', parentId())->where('module', $module)->first();
             $setting = settings();
             $errorMessage = '';
-            if (!empty($notification) && $notification->enabled_email == 1 && !empty($invoice->tenants()->user->email)) {
+            if (!empty($notification) && $notification->enabled_email == 1 && !empty($invoice->clients()->user->email)) {
                 $notification_responce = MessageReplace($notification, $invoice->id);
                 $datas['subject'] = $notification_responce['subject'];
                 $datas['message'] = $notification_responce['message'];
                 $datas['module'] = $module;
                 $datas['logo'] =  $setting['company_logo'];
 
-                $to = $invoice->tenants()->user->email;
+                $to = $invoice->clients()->user->email;
                 $response = commonEmailSend($to, $datas);
                 if ($response['status'] == 'error') {
                     $errorMessage = $response['message'];
@@ -115,12 +115,12 @@ class InvoiceController extends Controller
     {
         if (\Auth::user()->can('show invoice')) {
             $invoiceNumber = $invoice->invoice_id;
-            $tenant = Tenant::where('property', $invoice->property_id)->where('unit', $invoice->unit_id)->first();
+            $client = Client::where('property', $invoice->property_id)->where('unit', $invoice->unit_id)->first();
 
             $invoicePaymentSettings = invoicePaymentSettings($invoice->parent_id);
 
             $notification = Notification::where('parent_id', parentId())->where('module', 'payment_reminder')->first();
-            return view('invoice.show', compact('invoiceNumber', 'invoice', 'tenant', 'invoicePaymentSettings', 'notification'));
+            return view('invoice.show', compact('invoiceNumber', 'invoice', 'client', 'invoicePaymentSettings', 'notification'));
         } else {
             return redirect()->back()->with('error', __('Permission Denied!'));
         }
@@ -320,8 +320,8 @@ class InvoiceController extends Controller
     public function invoicePaymentRemindData(Request $request, $id)
     {
         $invoice = Invoice::find($id);
-        $tenant = Tenant::where('property', $invoice->property_id)->where('unit', $invoice->unit_id)->first();
-        $user = User::find($tenant->user_id);
+        $client = Client::where('property', $invoice->property_id)->where('unit', $invoice->unit_id)->first();
+        $user = User::find($client->user_id);
 
         $notification = Notification::where('parent_id', parentId())->where('module', 'payment_reminder')->first();
         $module = 'payment_reminder';
@@ -340,7 +340,7 @@ class InvoiceController extends Controller
                 $replace = [];
 
                 $invoice = Invoice::find($id);
-                $user_name = $invoice->tenants()->user->name;
+                $user_name = $invoice->clients()->user->name;
                 $invoice_number = invoicePrefix() . $invoice->invoice_id;
                 $search = ['{company_name}', '{company_email}', '{company_phone_number}', '{company_address}', '{company_currency}', '{user_name}', '{invoice_number}', '{invoice_date}', '{invoice_due_date}', '{amount}', '{invoice_description}'];
                 $replace = [$settings['company_name'], $settings['company_email'], $settings['company_phone'], $settings['company_address'], $settings['CURRENCY_SYMBOL'], $user_name, $invoice_number, $invoice->created_at, $invoice->end_date, priceFormat($invoice->getInvoiceDueAmount()), $invoice->notes];

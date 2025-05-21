@@ -92,12 +92,12 @@
                 <li class="cdxmenu-title">
                     <h5>{{ __('Business Management') }}</h5>
                 </li>
-                @if (Gate::check('manage tenant'))
+                @if (Gate::check('manage client'))
                     <li
-                        class="menu-item {{ in_array($routeName, ['tenant.index', 'tenant.create', 'tenant.edit', 'tenant.show']) ? 'active' : '' }}">
-                        <a href="{{ route('tenant.index') }}">
+                        class="menu-item {{ in_array($routeName, ['client.index', 'client.create', 'client.edit', 'client.show']) ? 'active' : '' }}">
+                        <a href="{{ route('client.index') }}">
                             <div class="icon-item"><i data-feather="user"></i></div>
-                            <span>{{ __('Tenants') }} </span>
+                            <span>{{ __('Clients') }} </span>
                         </a>
                     </li>
                 @endif
@@ -109,7 +109,7 @@
                         </a>
                     </li>
                 @endif
-                @if (Gate::check('manage tenant') || Gate::check('manage property') || Gate::check('manage unit'))
+                @if (Gate::check('manage client') || Gate::check('manage property') || Gate::check('manage unit'))
                     <li
                         class="menu-item {{ in_array($routeName, ['property.index', 'property.create', 'property.edit', 'property.show', 'unit.index']) ? 'active' : '' }}">
                         <a href="javascript:void(0);">

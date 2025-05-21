@@ -49,11 +49,11 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function totalUser()
     {
-        return User::whereNotIn('type',['tenant','maintainer'])->where('parent_id', $this->id)->count();
+        return User::whereNotIn('type',['client','maintainer'])->where('parent_id', $this->id)->count();
     }
-    public function totalTenant()
+    public function totalClient()
     {
-        return User::where('type','tenant')->where('parent_id', $this->id)->count();
+        return User::where('type','client')->where('parent_id', $this->id)->count();
     }
 
     public function getNameAttribute()
@@ -104,16 +104,16 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasOne('App\Models\Subscription','id','subscription');
     }
 
-    public function tenants()
+    public function clients()
     {
-        return $this->hasOne('App\Models\Tenant','user_id','id');
+        return $this->hasOne('App\Models\Client','user_id','id');
     }
 
     public static $systemModules=[
         'user',
         'property',
         'unit',
-        'tenant',
+        'client',
         'invoice',
         'maintainer',
         'maintenance request',

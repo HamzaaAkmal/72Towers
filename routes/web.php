@@ -12,7 +12,7 @@ use App\Http\Controllers\NoticeBoardController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\CouponController;
 use App\Http\Controllers\PropertyController;
-use App\Http\Controllers\TenantController;
+use App\Http\Controllers\ClientController;
 use App\Http\Controllers\TypeController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\ExpenseController;
@@ -238,7 +238,7 @@ Route::group(
 );
 
 //-------------------------------Tenant-------------------------------------------
-Route::resource('tenant', TenantController::class)->middleware(
+Route::resource('client', ClientController::class)->middleware(
     [
         'auth',
         'XSS',

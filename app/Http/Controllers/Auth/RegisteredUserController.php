@@ -65,7 +65,7 @@ class RegisteredUserController extends Controller
         $owner->assignRole($role_r);
         Auth::login($owner);
 
-        defaultTenantCreate($owner->id);
+        defaultClientCreate($owner->id);
         defaultMaintainerCreate($owner->id);
         defultTemplate($owner->id);
 

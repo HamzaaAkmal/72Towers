@@ -26,9 +26,9 @@ class Notification extends Model
             'templete' => '
             <p><strong>Dear {new_user_name}</strong>,</p><p>&nbsp;</p><blockquote><p>Welcome to {company_name}! We are excited to have you on board and look forward to providing you with an exceptional experience.</p><p>We hope you enjoy your experience with us. If you have any feedback, feel free to share it with us.</p><p>&nbsp;</p><p>Thank you for choosing {company_name}!</p></blockquote><p>Best regards,</p><p>{company_name}</p><p>{company_email}</p>',
         ],
-        'tenant_create' =>
+        'client_create' =>
         [
-            'name' => 'New Tenant',
+            'name' => 'New Client',
             'short_code' => ['{company_name}', '{company_email}', '{company_phone_number}', '{company_address}', '{company_currency}', '{user_name}'],
             'subject' => 'Welcome to {company_name}!',
             'templete' => '
@@ -45,19 +45,19 @@ class Notification extends Model
         'maintenance_request_create' =>
         [
             'name' => 'New Maintenance Request',
-            'short_code' => ['{company_name}', '{company_email}', '{company_phone_number}', '{company_address}', '{company_currency}', '{tenant_name}', '{created_at}', '{issue_type}', '{issue_description}', '{tenant_number}', '{tenant_mail}'],
+            'short_code' => ['{company_name}', '{company_email}', '{company_phone_number}', '{company_address}', '{company_currency}', '{client_name}', '{created_at}', '{issue_type}', '{issue_description}', '{client_number}', '{client_mail}'],
             'subject' => 'New Maintenance Request Created',
             'templete' => '
-                <p><strong class="ql-size-huge">Dear Owner,</strong></p><p>We would like to inform you that a new maintenance request has been created for your property. Below are the details of the request:</p><p><strong>Request Details:</strong></p><ul><li>	Submitted By: {tenant_name}</li><li>	Submitted On: {created_at}</li><li>	Category: {issue_type}</li><li>	Description: {issue_description}</li></ul><p><br></p><p><strong>Tenant Contact Information:</strong></p><ul><li>	Name: {tenant_name}</li><li>	Phone: {tenant_number}</li><li>	Email: {tenant_mail}</li></ul><p>Thank you for your attention to this matter.</p><p><strong>Best regards,</strong></p><p><strong>{tenant_name}</strong></p><p><strong>{tenant_mail}</strong></p>
+                <p><strong class="ql-size-huge">Dear Owner,</strong></p><p>We would like to inform you that a new maintenance request has been created for your property. Below are the details of the request:</p><p><strong>Request Details:</strong></p><ul><li>	Submitted By: {client_name}</li><li>	Submitted On: {created_at}</li><li>	Category: {issue_type}</li><li>	Description: {issue_description}</li></ul><p><br></p><p><strong>Client Contact Information:</strong></p><ul><li>	Name: {client_name}</li><li>	Phone: {client_number}</li><li>	Email: {client_mail}</li></ul><p>Thank you for your attention to this matter.</p><p><strong>Best regards,</strong></p><p><strong>{client_name}</strong></p><p><strong>{client_mail}</strong></p>
             ',
         ],
         'maintenance_request_complete' =>
         [
             'name' => 'Maintenance Request Complete',
-            'short_code' => ['{company_name}', '{company_email}', '{company_phone_number}', '{company_address}', '{company_currency}', '{tenant_name}', '{submitted_at}', '{issue_type}', '{issue_description}', '{completed_at}', '{maintainer_email}', '{maintainer_number}', '{maintainer_name}'],
+            'short_code' => ['{company_name}', '{company_email}', '{company_phone_number}', '{company_address}', '{company_currency}', '{client_name}', '{submitted_at}', '{issue_type}', '{issue_description}', '{completed_at}', '{maintainer_email}', '{maintainer_number}', '{maintainer_name}'],
             'subject' => 'Maintenance Request Completed!',
             'templete' => '
-                <p><strong>Dear {tenant_name},</strong></p><p><br></p><p>We are pleased to inform you that your maintenance request has been successfully completed.</p><p><br></p><p> <strong>Request Details:</strong></p><ul><li>Submitted By: {tenant_name}</li><li>Submitted On: {created_at}</li><li>Category: {issue_type}</li><li>Description: {issue_description}</li></ul><p><br></p><p><strong>Completion Details:</strong></p><ul><li> Completed On: {completed_at}</li> </ul><p><br></p><p><strong>Feedback:</strong></p><p>We value your feedback to improve our services. Please let us know if you are satisfied with the maintenance performed or if there are any further issues that need attention.</p><p><br></p><p><strong>Contact Information:</strong></p><p> If you have any questions or need further assistance, please contact us at {maintainer_email} or {maintainer_number}.</p><p>Thank you for your cooperation and patience.</p><p><br></p><p><strong>Best regards,</strong></p><p>{maintainer_name}</p><p>{maintainer_email}</p>
+                <p><strong>Dear {client_name},</strong></p><p><br></p><p>We are pleased to inform you that your maintenance request has been successfully completed.</p><p><br></p><p> <strong>Request Details:</strong></p><ul><li>Submitted By: {client_name}</li><li>Submitted On: {created_at}</li><li>Category: {issue_type}</li><li>Description: {issue_description}</li></ul><p><br></p><p><strong>Completion Details:</strong></p><ul><li> Completed On: {completed_at}</li> </ul><p><br></p><p><strong>Feedback:</strong></p><p>We value your feedback to improve our services. Please let us know if you are satisfied with the maintenance performed or if there are any further issues that need attention.</p><p><br></p><p><strong>Contact Information:</strong></p><p> If you have any questions or need further assistance, please contact us at {maintainer_email} or {maintainer_number}.</p><p>Thank you for your cooperation and patience.</p><p><br></p><p><strong>Best regards,</strong></p><p>{maintainer_name}</p><p>{maintainer_email}</p>
             ',
         ],
         'invoice_create' =>

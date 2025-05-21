@@ -14,7 +14,7 @@ use App\Models\Property;
 use App\Models\PropertyUnit;
 use App\Models\Subscription;
 use App\Models\Support;
-use App\Models\Tenant;
+use App\Models\Client;
 use App\Models\User;
 use Carbon\Carbon;
 
@@ -39,12 +39,12 @@ class HomeController extends Controller
                 $result['totalContact'] = Contact::where('parent_id', parentId())->count();
 
 
-                if (\Auth::user()->type == 'tenant') {
-                    $tenant=Tenant::where('user_id',\Auth::user()->id)->first();
-                    $result['totalInvoice']=Invoice::where('property_id',$tenant->property)->where('unit_id',$tenant->unit)->count();
-                    $result['unit']=PropertyUnit::find($tenant->unit);
+                if (\Auth::user()->type == 'client') {
+                    $client=Client::where('user_id',\Auth::user()->id)->first();
+                    $result['totalInvoice']=Invoice::where('property_id',$client->property)->where('unit_id',$client->unit)->count();
+                    $result['unit']=PropertyUnit::find($client->unit);
 
-                    return view('dashboard.tenant', compact('result','tenant'));
+                    return view('dashboard.client', compact('result','client'));
                 }
 
                 if (\Auth::user()->type == 'maintainer') {
@@ -60,7 +60,7 @@ class HomeController extends Controller
                 $result['totalIncome'] = InvoicePayment::where('parent_id', parentId())->sum('amount');
                 $result['totalExpense'] = Expense::where('parent_id', parentId())->sum('amount');
                 $result['recentProperty'] = Property::where('parent_id', parentId())->orderby('id', 'desc')->limit(5)->get();
-                $result['recentTenant'] = Tenant::where('parent_id', parentId())->orderby('id', 'desc')->limit(5)->get();
+                $result['recentClient'] = Client::where('parent_id', parentId())->orderby('id', 'desc')->limit(5)->get();
                 $result['incomeExpenseByMonth'] = $this->incomeByMonth();
                 $result['settings']=settings();
 

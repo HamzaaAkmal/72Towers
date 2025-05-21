@@ -5,20 +5,20 @@ namespace App\Http\Controllers;
 use App\Models\Notification;
 use App\Models\Property;
 use App\Models\Subscription;
-use App\Models\Tenant;
-use App\Models\TenantDocument;
+use App\Models\Client;
+use App\Models\ClientDocument;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
 
-class TenantController extends Controller
+class ClientController extends Controller
 {
 
     public function index()
     {
         if (\Auth::user()->can('manage tenant')) {
-            $tenants = Tenant::where('parent_id', parentId())->get();
+            $tenants = Client::where('parent_id', parentId())->get();
             return view('tenant.index', compact('tenants'));
         } else {
             return redirect()->back()->with('error', __('Permission Denied!'));
@@ -57,8 +57,8 @@ class TenantController extends Controller
                     'address' => 'required',
                     'property' => 'required',
                     'unit' => 'required',
-                    'lease_start_date' => 'required',
-                    'lease_end_date' => 'required',
+                    'booking_start_date' => 'required',
+                    'booking_end_date' => 'required',
                 ]
             );
             if ($validator->fails()) {
@@ -75,7 +75,7 @@ class TenantController extends Controller
             if ($totalTenant >= $subscription->tenant_limit && $subscription->tenant_limit != 0) {
                 return response()->json([
                     'status' => 'error',
-                    'msg' => __('Your tenant limit is over, please upgrade your subscription.'),
+                    'msg' => __('Your client limit is over, please upgrade your subscription.'),
                     'id' => 0,
                 ]);
             }
@@ -97,57 +97,57 @@ class TenantController extends Controller
             $user->assignRole($userRole);
 
             if ($request->profile != 'undefined') {
-                $tenantFilenameWithExt = $request->file('profile')->getClientOriginalName();
-                $tenantFilename = pathinfo($tenantFilenameWithExt, PATHINFO_FILENAME);
-                $tenantExtension = $request->file('profile')->getClientOriginalExtension();
-                $tenantFileName = $tenantFilename . '_' . time() . '.' . $tenantExtension;
+                $clientFilenameWithExt = $request->file('profile')->getClientOriginalName();
+                $clientFilename = pathinfo($clientFilenameWithExt, PATHINFO_FILENAME);
+                $clientExtension = $request->file('profile')->getClientOriginalExtension();
+                $clientFileName = $clientFilename . '_' . time() . '.' . $clientExtension;
                 $dir = storage_path('upload/profile');
                 if (!file_exists($dir)) {
                     mkdir($dir, 0777, true);
                 }
-                $request->file('profile')->storeAs('upload/profile/', $tenantFileName);
-                $user->profile = $tenantFileName;
+                $request->file('profile')->storeAs('upload/profile/', $clientFileName);
+                $user->profile = $clientFileName;
                 $user->save();
             }
 
-            $tenant = new Tenant();
-            $tenant->user_id = $user->id;
-            $tenant->family_member = $request->family_member;
-            $tenant->country = $request->country;
-            $tenant->state = $request->state;
-            $tenant->city = $request->city;
-            $tenant->zip_code = $request->zip_code;
-            $tenant->address = $request->address;
-            $tenant->property = $request->property;
-            $tenant->unit = $request->unit;
-            $tenant->lease_start_date = $request->lease_start_date;
-            $tenant->lease_end_date = $request->lease_end_date;
-            $tenant->parent_id = parentId();
-            $tenant->save();
+            $client = new Client();
+            $client->user_id = $user->id;
+            $client->family_member = $request->family_member;
+            $client->country = $request->country;
+            $client->state = $request->state;
+            $client->city = $request->city;
+            $client->zip_code = $request->zip_code;
+            $client->address = $request->address;
+            $client->property = $request->property;
+            $client->unit = $request->unit;
+            $client->booking_start_date = $request->booking_start_date;
+            $client->booking_end_date = $request->booking_end_date;
+            $client->parent_id = parentId();
+            $client->save();
 
 
-            if (!empty($request->tenant_images)) {
-                foreach ($request->tenant_images as $file) {
-                    $tenantFilenameWithExt = $file->getClientOriginalName();
-                    $tenantFilename = pathinfo($tenantFilenameWithExt, PATHINFO_FILENAME);
-                    $tenantExtension = $file->getClientOriginalExtension();
-                    $tenantFileName = $tenantFilename . '_' . time() . '.' . $tenantExtension;
-                    $dir = storage_path('upload/tenant');
+            if (!empty($request->client_images)) {
+                foreach ($request->client_images as $file) {
+                    $clientFilenameWithExt = $file->getClientOriginalName();
+                    $clientFilename = pathinfo($clientFilenameWithExt, PATHINFO_FILENAME);
+                    $clientExtension = $file->getClientOriginalExtension();
+                    $clientFileName = $clientFilename . '_' . time() . '.' . $clientExtension;
+                    $dir = storage_path('upload/client');
                     if (!file_exists($dir)) {
                         mkdir($dir, 0777, true);
                     }
-                    $file->storeAs('upload/tenant/', $tenantFileName);
+                    $file->storeAs('upload/client/', $clientFileName);
 
-                    $tenantImage = new TenantDocument();
-                    $tenantImage->property_id = $request->property;
-                    $tenantImage->tenant_id = $tenant->id;
-                    $tenantImage->document = $tenantFileName;
-                    $tenantImage->parent_id = parentId();
-                    $tenantImage->save();
+                    $clientImage = new ClientDocument();
+                    $clientImage->property_id = $request->property;
+                    $clientImage->client_id = $client->id;
+                    $clientImage->document = $clientFileName;
+                    $clientImage->parent_id = parentId();
+                    $clientImage->save();
                 }
             }
 
-            $module = 'tenant_create';
+            $module = 'client_create';
             $notification = Notification::where('parent_id', parentId())->where('module', $module)->first();
             $notification->password=$request->password;
             $errorMessage='';
@@ -167,7 +167,7 @@ class TenantController extends Controller
 
             return response()->json([
                 'status' => 'success',
-                'msg' => __('Tenant successfully created.'). '</br>' . $errorMessage,
+                'msg' => __('Client successfully created.'). '</br>' . $errorMessage,
 
             ]);
         } else {
@@ -176,39 +176,39 @@ class TenantController extends Controller
     }
 
 
-    public function show(Tenant $tenant)
+    public function show(Client $client)
     {
-        if (\Auth::user()->can('show tenant')) {
-            return view('tenant.show', compact('tenant'));
+        if (\Auth::user()->can('show client')) {
+            return view('client.show', compact('client'));
         } else {
             return redirect()->back()->with('error', __('Permission Denied!'));
         }
     }
 
 
-    public function edit(Tenant $tenant)
+    public function edit(Client $client)
     {
-        if (\Auth::user()->can('edit tenant')) {
+        if (\Auth::user()->can('edit client')) {
             $property = Property::where('parent_id', parentId())->get()->pluck('name', 'id');
             $property->prepend(__('Select Property'), 0);
 
-            $user = User::find($tenant->user_id);
-            return view('tenant.edit', compact('property', 'tenant', 'user'));
+            $user = User::find($client->user_id);
+            return view('client.edit', compact('property', 'client', 'user'));
         } else {
             return redirect()->back()->with('error', __('Permission Denied!'));
         }
     }
 
 
-    public function update(Request $request, Tenant $tenant)
+    public function update(Request $request, Client $client)
     {
-        if (\Auth::user()->can('edit tenant')) {
+        if (\Auth::user()->can('edit client')) {
             $validator = \Validator::make(
                 $request->all(),
                 [
                     'first_name' => 'required',
                     'last_name' => 'required',
-                    'email' => 'required|email|unique:users,email,' . $tenant->user_id,
+                    'email' => 'required|email|unique:users,email,' . $client->user_id,
                     'phone_number' => 'required',
                     'family_member' => 'required',
                     'country' => 'required',
@@ -218,8 +218,8 @@ class TenantController extends Controller
                     'address' => 'required',
                     'property' => 'required',
                     'unit' => 'required',
-                    'lease_start_date' => 'required',
-                    'lease_end_date' => 'required',
+                    'booking_start_date' => 'required',
+                    'booking_end_date' => 'required',
                 ]
             );
             if ($validator->fails()) {
@@ -231,7 +231,7 @@ class TenantController extends Controller
                 ]);
             }
 
-            $user = User::find($tenant->user_id);
+            $user = User::find($client->user_id);
             $user->first_name = $request->first_name;
             $user->last_name = $request->last_name;
             $user->email = $request->email;
@@ -239,57 +239,57 @@ class TenantController extends Controller
             $user->save();
 
             if ($request->profile != '') {
-                $tenantFilenameWithExt = $request->file('profile')->getClientOriginalName();
-                $tenantFilename = pathinfo($tenantFilenameWithExt, PATHINFO_FILENAME);
-                $tenantExtension = $request->file('profile')->getClientOriginalExtension();
-                $tenantFileName = $tenantFilename . '_' . time() . '.' . $tenantExtension;
+                $clientFilenameWithExt = $request->file('profile')->getClientOriginalName();
+                $clientFilename = pathinfo($clientFilenameWithExt, PATHINFO_FILENAME);
+                $clientExtension = $request->file('profile')->getClientOriginalExtension();
+                $clientFileName = $clientFilename . '_' . time() . '.' . $clientExtension;
                 $dir = storage_path('upload/profile');
                 if (!file_exists($dir)) {
                     mkdir($dir, 0777, true);
                 }
-                $request->file('profile')->storeAs('upload/profile/', $tenantFileName);
-                $user->profile = $tenantFileName;
+                $request->file('profile')->storeAs('upload/profile/', $clientFileName);
+                $user->profile = $clientFileName;
                 $user->save();
             }
 
-            $tenant->family_member = $request->family_member;
-            $tenant->country = $request->country;
-            $tenant->state = $request->state;
-            $tenant->city = $request->city;
-            $tenant->zip_code = $request->zip_code;
-            $tenant->address = $request->address;
-            $tenant->property = $request->property;
-            $tenant->unit = $request->unit;
-            $tenant->lease_start_date = $request->lease_start_date;
-            $tenant->lease_end_date = $request->lease_end_date;
-            $tenant->save();
+            $client->family_member = $request->family_member;
+            $client->country = $request->country;
+            $client->state = $request->state;
+            $client->city = $request->city;
+            $client->zip_code = $request->zip_code;
+            $client->address = $request->address;
+            $client->property = $request->property;
+            $client->unit = $request->unit;
+            $client->booking_start_date = $request->booking_start_date;
+            $client->booking_end_date = $request->booking_end_date;
+            $client->save();
 
 
 
-            if (!empty($request->tenant_images)) {
-                foreach ($request->tenant_images as $file) {
-                    $tenantFilenameWithExt = $file->getClientOriginalName();
-                    $tenantFilename = pathinfo($tenantFilenameWithExt, PATHINFO_FILENAME);
-                    $tenantExtension = $file->getClientOriginalExtension();
-                    $tenantFileName = $tenantFilename . '_' . time() . '.' . $tenantExtension;
-                    $dir = storage_path('upload/tenant');
+            if (!empty($request->client_images)) {
+                foreach ($request->client_images as $file) {
+                    $clientFilenameWithExt = $file->getClientOriginalName();
+                    $clientFilename = pathinfo($clientFilenameWithExt, PATHINFO_FILENAME);
+                    $clientExtension = $file->getClientOriginalExtension();
+                    $clientFileName = $clientFilename . '_' . time() . '.' . $clientExtension;
+                    $dir = storage_path('upload/client');
                     if (!file_exists($dir)) {
                         mkdir($dir, 0777, true);
                     }
-                    $file->storeAs('upload/tenant/', $tenantFileName);
+                    $file->storeAs('upload/client/', $clientFileName);
 
-                    $tenantImage = new TenantDocument();
-                    $tenantImage->property_id = $request->property;
-                    $tenantImage->tenant_id = $tenant->id;
-                    $tenantImage->document = $tenantFileName;
-                    $tenantImage->parent_id = parentId();
-                    $tenantImage->save();
+                    $clientImage = new ClientDocument();
+                    $clientImage->property_id = $request->property;
+                    $clientImage->client_id = $client->id;
+                    $clientImage->document = $clientFileName;
+                    $clientImage->parent_id = parentId();
+                    $clientImage->save();
                 }
             }
 
             return response()->json([
                 'status' => 'success',
-                'msg' => __('Tenant successfully updated.'),
+                'msg' => __('Client successfully updated.'),
             ]);
         } else {
             return redirect()->back()->with('error', __('Permission Denied!'));
@@ -297,12 +297,12 @@ class TenantController extends Controller
     }
 
 
-    public function destroy(Tenant $tenant)
+    public function destroy(Client $client)
     {
-        if (\Auth::user()->can('delete tenant')) {
-            User::where('id',$tenant->user_id)->delete();
-            $tenant->delete();
-            return redirect()->back()->with('success', 'Tenant successfully deleted.');
+        if (\Auth::user()->can('delete client')) {
+            User::where('id',$client->user_id)->delete();
+            $client->delete();
+            return redirect()->back()->with('success', 'Client successfully deleted.');
         } else {
             return redirect()->back()->with('error', __('Permission Denied!'));
         }

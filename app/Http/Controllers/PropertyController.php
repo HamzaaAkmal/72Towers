@@ -272,8 +272,8 @@ class PropertyController extends Controller
     public function unitCreate($property_id)
     {
         $types = PropertyUnit::$Types;
-        $rentTypes = PropertyUnit::$rentTypes;
-        return view('unit.create', compact('types', 'property_id', 'rentTypes'));
+        $chargeTypes = PropertyUnit::$chargeTypes;
+        return view('unit.create', compact('types', 'property_id', 'chargeTypes'));
     }
 
 
@@ -287,8 +287,8 @@ class PropertyController extends Controller
                     'bedroom' => 'required',
                     'kitchen' => 'required',
                     'baths' => 'required',
-                    'rent' => 'required',
-                    'rent_type' => 'required',
+                    'amount_due' => 'required',
+                    'charge_type' => 'required',
                     'deposit_type' => 'required',
                     'deposit_amount' => 'required',
                     'late_fee_type' => 'required',
@@ -307,14 +307,14 @@ class PropertyController extends Controller
             $unit->bedroom = $request->bedroom;
             $unit->kitchen = $request->kitchen;
             $unit->baths = $request->baths;
-            $unit->rent = $request->rent;
-            $unit->rent_type = $request->rent_type;
-            if ($request->rent_type == 'custom') {
+            $unit->amount_due = $request->amount_due;
+            $unit->charge_type = $request->charge_type;
+            if ($request->charge_type == 'custom') {
                 $unit->start_date = $request->start_date;
                 $unit->end_date = $request->end_date;
                 $unit->payment_due_date = $request->payment_due_date;
             } else {
-                $unit->rent_duration = $request->rent_duration;
+                $unit->charge_duration = $request->charge_duration;
             }
 
             $unit->deposit_type = $request->deposit_type;
@@ -336,8 +336,8 @@ class PropertyController extends Controller
     {
         $name = Property::all('name', 'id')->pluck('name', 'id');
         $types = PropertyUnit::$Types;
-        $rentTypes = PropertyUnit::$rentTypes;
-        return view('unit.directcreate', compact('types', 'rentTypes', 'name'));
+        $chargeTypes = PropertyUnit::$chargeTypes;
+        return view('unit.directcreate', compact('types', 'chargeTypes', 'name'));
     }
 
     public function unitdirectStore(Request $request)
@@ -350,8 +350,8 @@ class PropertyController extends Controller
                     'bedroom' => 'required',
                     'kitchen' => 'required',
                     'baths' => 'required',
-                    'rent' => 'required',
-                    'rent_type' => 'required',
+                    'amount_due' => 'required',
+                    'charge_type' => 'required',
                     'deposit_type' => 'required',
                     'deposit_amount' => 'required',
                     'late_fee_type' => 'required',
@@ -371,14 +371,14 @@ class PropertyController extends Controller
             $unit->bedroom = $request->bedroom;
             $unit->kitchen = $request->kitchen;
             $unit->baths = $request->baths;
-            $unit->rent = $request->rent;
-            $unit->rent_type = $request->rent_type;
-            if ($request->rent_type == 'custom') {
+            $unit->amount_due = $request->amount_due;
+            $unit->charge_type = $request->charge_type;
+            if ($request->charge_type == 'custom') {
                 $unit->start_date = $request->start_date;
                 $unit->end_date = $request->end_date;
                 $unit->payment_due_date = $request->payment_due_date;
             } else {
-                $unit->rent_duration = $request->rent_duration;
+                $unit->charge_duration = $request->charge_duration;
             }
 
             $unit->deposit_type = $request->deposit_type;
@@ -400,8 +400,8 @@ class PropertyController extends Controller
     {
         $unit = PropertyUnit::find($unit_id);
         $types = PropertyUnit::$Types;
-        $rentTypes = PropertyUnit::$rentTypes;
-        return view('unit.edit', compact('types', 'property_id', 'rentTypes', 'unit'));
+        $chargeTypes = PropertyUnit::$chargeTypes;
+        return view('unit.edit', compact('types', 'property_id', 'chargeTypes', 'unit'));
     }
 
     public function unitUpdate(Request $request, $property_id, $unit_id)
@@ -413,8 +413,8 @@ class PropertyController extends Controller
                     'bedroom' => 'required',
                     'kitchen' => 'required',
                     'baths' => 'required',
-                    'rent' => 'required',
-                    'rent_type' => 'required',
+                    'amount_due' => 'required',
+                    'charge_type' => 'required',
                     'deposit_type' => 'required',
                     'deposit_amount' => 'required',
                     'late_fee_type' => 'required',
@@ -433,14 +433,14 @@ class PropertyController extends Controller
             $unit->bedroom = $request->bedroom;
             $unit->kitchen = $request->kitchen;
             $unit->baths = $request->baths;
-            $unit->rent = $request->rent;
-            $unit->rent_type = $request->rent_type;
-            if ($request->rent_type == 'custom') {
+            $unit->amount_due = $request->amount_due;
+            $unit->charge_type = $request->charge_type;
+            if ($request->charge_type == 'custom') {
                 $unit->start_date = $request->start_date;
                 $unit->end_date = $request->end_date;
                 $unit->payment_due_date = $request->payment_due_date;
             } else {
-                $unit->rent_duration = $request->rent_duration;
+                $unit->charge_duration = $request->charge_duration;
             }
 
             $unit->deposit_type = $request->deposit_type;

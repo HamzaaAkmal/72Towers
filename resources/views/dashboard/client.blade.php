@@ -25,7 +25,7 @@ $settings=settings();
                 </div>
                 <div class="card-body progressCounter">
                     <h2>
-                        <span class="">{{!empty($tenant->properties)?$tenant->properties->name:'-'}}</span>
+                        <span class="">{{!empty($client->properties)?$client->properties->name:'-'}}</span>
                     </h2>
                 </div>
             </div>
@@ -37,7 +37,7 @@ $settings=settings();
                 </div>
                 <div class="card-body progressCounter">
                     <h2>
-                        <span class="">{{!empty($tenant->units)?$tenant->units->name:'-'}}</span>
+                        <span class="">{{!empty($client->units)?$client->units->name:'-'}}</span>
                     </h2>
                 </div>
             </div>
@@ -45,11 +45,11 @@ $settings=settings();
         <div class="col-xxl-3 col-sm-6 cdx-xxl-50">
             <div class="card sale-revenue">
                 <div class="card-header">
-                    <h4>{{__('Rent')}}</h4>
+                    <h4>{{__('Amount Due')}}</h4>
                 </div>
                 <div class="card-body progressCounter">
                     <h2>
-                        <span class="">{{$settings['CURRENCY_SYMBOL']}}{{!empty($result['unit'])?$result['unit']->rent:'-'}}</span>
+                        <span class="">{{$settings['CURRENCY_SYMBOL']}}{{!empty($result['unit'])?$result['unit']->amount_due:'-'}}</span>
                     </h2>
                 </div>
             </div>
