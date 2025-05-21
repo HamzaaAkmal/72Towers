@@ -50,8 +50,8 @@ class MaintenanceRequest extends Model
         return $this->hasOne(User::class, 'id', 'maintainer_id');
     }
 
-    public function tenetData()
+    public function clientData()
     {
-        return Tenant::where('property',$this->property_id)->where('unit',$this->unit_id)->first();
+        return Client::where('property',$this->property_id)->where('unit',$this->unit_id)->first();
     }
 }

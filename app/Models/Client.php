@@ -5,9 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Tenant extends Model
+class Client extends Model
 {
     use HasFactory;
+    protected $table = 'tenants';
 
     protected $fillable=[
         'user_id',
@@ -20,8 +21,8 @@ class Tenant extends Model
         'zip_code',
         'property',
         'unit',
-        'lease_start_date',
-        'lease_end_date',
+        'booking_start_date',
+        'booking_end_date',
         'is_active',
     ];
 
@@ -38,6 +39,6 @@ class Tenant extends Model
 
     public function documents()
     {
-        return $this->hasMany('App\Models\TenantDocument','tenant_id','id');
+        return $this->hasMany('App\Models\ClientDocument','client_id','id');
     }
 }

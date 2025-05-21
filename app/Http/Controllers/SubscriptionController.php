@@ -44,7 +44,7 @@ class SubscriptionController extends Controller
                     'interval' => 'required',
                     'user_limit' => 'required',
                     'property_limit' => 'required',
-                    'tenant_limit' => 'required',
+                    'client_limit' => 'required',
                 ]
             );
             if ($validator->fails()) {
@@ -59,7 +59,7 @@ class SubscriptionController extends Controller
             $subscription->package_amount = $request->package_amount;
             $subscription->user_limit = $request->user_limit;
             $subscription->property_limit = $request->property_limit;
-            $subscription->tenant_limit = $request->tenant_limit;
+            $subscription->client_limit = $request->client_limit;
             $subscription->enabled_logged_history = isset($request->enabled_logged_history) ? 1 : 0;
             $subscription->save();
 
@@ -104,7 +104,7 @@ class SubscriptionController extends Controller
                     'interval' => 'required',
                     'user_limit' => 'required',
                     'property_limit' => 'required',
-                    'tenant_limit' => 'required',
+                    'client_limit' => 'required',
                 ]
             );
             if ($validator->fails()) {
@@ -118,7 +118,7 @@ class SubscriptionController extends Controller
             $subscription->package_amount = $request->package_amount;
             $subscription->user_limit = $request->user_limit;
             $subscription->property_limit = $request->property_limit;
-            $subscription->tenant_limit = $request->tenant_limit;
+            $subscription->client_limit = $request->client_limit;
             $subscription->enabled_logged_history = isset($request->enabled_logged_history) ? 1 : 0;
             $subscription->save();
 

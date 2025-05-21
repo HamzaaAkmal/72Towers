@@ -6,7 +6,7 @@ use App\Models\Maintainer;
 use App\Models\MaintenanceRequest;
 use App\Models\Notification;
 use App\Models\Property;
-use App\Models\Tenant;
+use App\Models\Client;
 use App\Models\Type;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -20,10 +20,10 @@ class MaintenanceRequestController extends Controller
         if (\Auth::user()->can('manage maintenance request')) {
             if (\Auth::user()->type == 'maintainer') {
                 $maintenanceRequests = MaintenanceRequest::where('maintainer_id', \Auth::user()->id)->get();
-            } elseif (\Auth::user()->type == 'tenant') {
+            } elseif (\Auth::user()->type == 'client') {
                 $user = \Auth::user();
-                $tenant = $user->tenants;
-                $maintenanceRequests = MaintenanceRequest::where('property_id', !empty($tenant) ? $tenant->property : 0)->where('unit_id', !empty($tenant) ? $tenant->unit : 0)->get();
+                $client = $user->clients;
+                $maintenanceRequests = MaintenanceRequest::where('property_id', !empty($client) ? $client->property : 0)->where('unit_id', !empty($client) ? $client->unit : 0)->get();
             } else {
                 $maintenanceRequests = MaintenanceRequest::where('parent_id', parentId())->get();
             }
@@ -251,16 +251,16 @@ class MaintenanceRequestController extends Controller
         }
 
 
-        $tenants = Tenant::where('property', $maintenanceRequest->property_id)
+        $clients = Client::where('property', $maintenanceRequest->property_id)
             ->where('unit', $maintenanceRequest->unit_id)
             ->get();
 
-        if ($tenants->isNotEmpty()) {
-            // Collect all tenant user_ids and parent_ids
+        if ($clients->isNotEmpty()) {
+            // Collect all client user_ids and parent_ids
             $userIds = [];
-            foreach ($tenants as $tenant) {
-                $userIds[] = $tenant->user_id;
-                $userIds[] = $tenant->parent_id;
+            foreach ($clients as $client) {
+                $userIds[] = $client->user_id;
+                $userIds[] = $client->parent_id;
             }
 
             // Remove duplicates and fetch all emails
@@ -300,10 +300,10 @@ class MaintenanceRequestController extends Controller
         if (\Auth::user()->can('manage maintenance request')) {
             if (\Auth::user()->type == 'maintainer') {
                 $maintenanceRequests = MaintenanceRequest::where('maintainer_id', \Auth::user()->id)->where('status', 'pending')->get();
-            } elseif (\Auth::user()->type == 'tenant') {
+            } elseif (\Auth::user()->type == 'client') {
                 $user = \Auth::user();
-                $tenant = $user->tenants;
-                $maintenanceRequests = MaintenanceRequest::where('property_id', !empty($tenant) ? $tenant->property : 0)->where('unit_id', !empty($tenant) ? $tenant->unit : 0)->where('status', 'pending')->get();
+                $client = $user->clients;
+                $maintenanceRequests = MaintenanceRequest::where('property_id', !empty($client) ? $client->property : 0)->where('unit_id', !empty($client) ? $client->unit : 0)->where('status', 'pending')->get();
             } else {
                 $maintenanceRequests = MaintenanceRequest::where('parent_id', parentId())->where('status', 'pending')->get();
             }
@@ -318,10 +318,10 @@ class MaintenanceRequestController extends Controller
         if (\Auth::user()->can('manage maintenance request')) {
             if (\Auth::user()->type == 'maintainer') {
                 $maintenanceRequests = MaintenanceRequest::where('maintainer_id', \Auth::user()->id)->where('status', 'in_progress')->get();
-            } elseif (\Auth::user()->type == 'tenant') {
+            } elseif (\Auth::user()->type == 'client') {
                 $user = \Auth::user();
-                $tenant = $user->tenants;
-                $maintenanceRequests = MaintenanceRequest::where('property_id', !empty($tenant) ? $tenant->property : 0)->where('unit_id', !empty($tenant) ? $tenant->unit : 0)->where('status', 'in_progress')->get();
+                $client = $user->clients;
+                $maintenanceRequests = MaintenanceRequest::where('property_id', !empty($client) ? $client->property : 0)->where('unit_id', !empty($client) ? $client->unit : 0)->where('status', 'in_progress')->get();
             } else {
                 $maintenanceRequests = MaintenanceRequest::where('parent_id', parentId())->where('status', 'in_progress')->get();
             }

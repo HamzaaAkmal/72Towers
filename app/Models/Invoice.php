@@ -37,9 +37,9 @@ class Invoice extends Model
         return $this->hasOne(PropertyUnit::class, 'id', 'unit_id');
     }
 
-    public function tenants()
+    public function clients()
     {
-        return Tenant::where('unit',$this->unit_id)->first();
+        return Client::where('unit',$this->unit_id)->first();
     }
 
     public function types()

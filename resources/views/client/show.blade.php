@@ -1,6 +1,6 @@
 @extends('layouts.app')
 @section('page-title')
-    {{__('Tenant Details')}}
+    {{__('Client Details')}}
 @endsection
 @section('page-class')
     cdxuser-profile
@@ -13,7 +13,7 @@
             <a href="{{route('dashboard')}}"><h1>{{__('Dashboard')}}</h1></a>
         </li>
         <li class="breadcrumb-item">
-            <a href="{{route('tenant.index')}}">{{__('Tenant')}}</a>
+            <a href="{{route('client.index')}}">{{__('Client')}}</a>
         </li>
         <li class="breadcrumb-item active">
             <a href="#">{{__('Details')}}</a>
@@ -30,13 +30,13 @@
                         <div class="card-body">
                             <div class="user-imgwrap">
                                 <img class="img-fluid rounded-50"
-                                     src="{{(!empty($tenant->user) && !empty($tenant->user->profile))? asset(Storage::url("upload/profile/".$tenant->user->profile)): asset(Storage::url("upload/profile/avatar.png"))}}"
+                                     src="{{(!empty($client->user) && !empty($client->user->profile))? asset(Storage::url("upload/profile/".$client->user->profile)): asset(Storage::url("upload/profile/avatar.png"))}}"
                                      alt="">
                             </div>
                             <div class="user-detailwrap">
-                                <h3>{{ucfirst(!empty($tenant->user)?$tenant->user->first_name:'').' '.ucfirst(!empty($tenant->user)?$tenant->user->last_name:'')}}</h3>
-                                <h6>{{!empty($tenant->user)?$tenant->user->email:'-'}}</h6>
-                                <h6>{{!empty($tenant->user)?$tenant->user->phone_number:'-'}} </h6>
+                                <h3>{{ucfirst(!empty($client->user)?$client->user->first_name:'').' '.ucfirst(!empty($client->user)?$client->user->last_name:'')}}</h3>
+                                <h6>{{!empty($client->user)?$client->user->email:'-'}}</h6>
+                                <h6>{{!empty($client->user)?$client->user->phone_number:'-'}} </h6>
                             </div>
                         </div>
                     </div>
@@ -56,7 +56,7 @@
                                     <div class="media">
                                         <div class="media-body">
                                             <h6>{{__('Total Family Member')}}</h6>
-                                            <p class="text-light">{{$tenant->family_member}}</p>
+                                            <p class="text-light">{{$client->family_member}}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -64,7 +64,7 @@
                                     <div class="media">
                                         <div class="media-body">
                                             <h6>{{__('Country')}}</h6>
-                                            <p class="text-light">{{$tenant->country}}</p>
+                                            <p class="text-light">{{$client->country}}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -72,7 +72,7 @@
                                     <div class="media">
                                         <div class="media-body">
                                             <h6>{{__('State')}}</h6>
-                                            <p class="text-light">{{$tenant->state}}</p>
+                                            <p class="text-light">{{$client->state}}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -80,7 +80,7 @@
                                     <div class="media">
                                         <div class="media-body">
                                             <h6>{{__('City')}}</h6>
-                                            <p class="text-light">{{$tenant->city}}</p>
+                                            <p class="text-light">{{$client->city}}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -88,7 +88,7 @@
                                     <div class="media">
                                         <div class="media-body">
                                             <h6>{{__('Zip Code')}}</h6>
-                                            <p class="text-light">{{$tenant->zip_code}}</p>
+                                            <p class="text-light">{{$client->zip_code}}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -96,7 +96,7 @@
                                     <div class="media">
                                         <div class="media-body">
                                             <h6>{{__('Property')}}</h6>
-                                            <p class="text-light">{{!empty($tenant->properties)?$tenant->properties->name:'-'}}</p>
+                                            <p class="text-light">{{!empty($client->properties)?$client->properties->name:'-'}}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -104,33 +104,33 @@
                                     <div class="media">
                                         <div class="media-body">
                                             <h6>{{__('Unit')}}</h6>
-                                            <p class="text-light">{{!empty($tenant->units)?$tenant->units->name:'-'}}</p>
+                                            <p class="text-light">{{!empty($client->units)?$client->units->name:'-'}}</p>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-md-3 col-lg-3 mb-20">
                                     <div class="media">
                                         <div class="media-body">
-                                            <h6>{{__('Lease Start Date')}}</h6>
-                                            <p class="text-light">{{dateFormat($tenant->lease_start_date)}}</p>
+                                            <h6>{{__('Booking Start Date')}}</h6>
+                                            <p class="text-light">{{dateFormat($client->booking_start_date)}}</p>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-md-3 col-lg-3 mb-20">
                                     <div class="media">
                                         <div class="media-body">
-                                            <h6>{{__('Lease End Date')}}</h6>
-                                            <p class="text-light">{{dateFormat($tenant->lease_end_date)}}</p>
+                                            <h6>{{__('Booking End Date')}}</h6>
+                                            <p class="text-light">{{dateFormat($client->booking_end_date)}}</p>
                                         </div>
                                     </div>
                                 </div>
-                                @if(!empty($tenant->documents))
+                                @if(!empty($client->documents))
                                     <div class="col-md-3 col-lg-3 mb-20">
                                         <div class="media">
                                             <div class="media-body">
                                                 <h6>{{__('Documents')}}</h6>
-                                                @foreach($tenant->documents as $doc)
-                                                    <a href="{{asset(Storage::url('upload/tenant')).'/'.$doc->document}}"
+                                                @foreach($client->documents as $doc)
+                                                    <a href="{{asset(Storage::url('upload/client')).'/'.$doc->document}}"
                                                        class="text-light" target="_blank"><i
                                                                 data-feather="download"></i></a>
                                                 @endforeach
@@ -142,7 +142,7 @@
                                     <div class="media">
                                         <div class="media-body">
                                             <h6>{{__('Address')}}</h6>
-                                            <p class="text-light">{{$tenant->address}}</p>
+                                            <p class="text-light">{{$client->address}}</p>
                                         </div>
                                     </div>
                                 </div>

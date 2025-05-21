@@ -14,14 +14,14 @@ class PropertyUnit extends Model
         'property_id',
         'baths',
         'kitchen',
-        'rent',
+        'amount_due',
         'deposit_amount',
         'deposit_type',
         'late_fee_type',
         'late_fee_amount',
         'incident_receipt_amount',
-        'rent_type',
-        'rent_duration',
+        'charge_type',
+        'charge_duration',
         'start_date',
         'end_date',
         'payment_due_date',
@@ -33,7 +33,7 @@ class PropertyUnit extends Model
         'fixed'=> 'Fixed',
         'percentage'=>'Percentage',
     ];
-    public static $rentTypes=[
+    public static $chargeTypes=[
         'monthly'=> 'Monthly',
         'yearly'=>'Yearly',
         'custom'=>'Custom',
@@ -43,8 +43,8 @@ class PropertyUnit extends Model
         return $this->hasOne('App\Models\Property','id','property_id');
     }
 
-    public function tenants()
+    public function clients()
     {
-        return Tenant::where('unit',$this->id)->first();
+        return Client::where('unit',$this->id)->first();
     }
 }

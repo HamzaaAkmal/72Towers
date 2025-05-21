@@ -9,7 +9,7 @@ use App\Models\LoggedHistory;
 use App\Models\MaintenanceRequest;
 use App\Models\Notification;
 use App\Models\Subscription;
-use App\Models\Tenant;
+use App\Models\Client;
 use App\Models\User;
 use App\Models\Property;
 use App\Providers\RouteServiceProvider;
@@ -200,16 +200,16 @@ if (!function_exists('emailTemplete')) {
                     ]
                 ],
                 [
-                    'slug' => 'tenant_create',
-                    'template' => __('Tenant Create'),
+                    'slug' => 'client_create',
+                    'template' => __('Client Create'),
                     'field_variable' =>
                     [
                         'user_id' => '{user_id}',
                         'password' => '{password}',
                         'property_name' => '{property_name}',
                         'unite_name' => '{unite_name}',
-                        'start_date' => '{start_date}',
-                        'end_date' => '{end_date}',
+                        'booking_start_date' => '{booking_start_date}',
+                        'booking_end_date' => '{booking_end_date}',
                     ]
                 ],
                 [
@@ -221,8 +221,8 @@ if (!function_exists('emailTemplete')) {
                         'password' => '{password}',
                         'property_name' => '{property_name}',
                         'unite_name' => '{unite_name}',
-                        'start_date' => '{start_date}',
-                        'end_date' => '{end_date}',
+                        'booking_start_date' => '{booking_start_date}',
+                        'booking_end_date' => '{booking_end_date}',
                     ]
                 ],
                 [
@@ -247,7 +247,7 @@ if (!function_exists('emailTemplete')) {
                     'template' => __('Invoice Create'),
                     'field_variable' =>
                     [
-                        'tenant_name' => '{tenant_name}',
+                        'client_name' => '{client_name}',
                     ]
                 ],
                 [
@@ -537,17 +537,17 @@ if (!function_exists('userLoggedHistory')) {
     }
 }
 
-if (!function_exists('defaultTenantCreate')) {
-    function defaultTenantCreate($id)
+if (!function_exists('defaultClientCreate')) {
+    function defaultClientCreate($id)
     {
-        // Default Tenant role
-        $tenantRoleData = [
-            'name' => 'tenant',
+        // Default Client role
+        $clientRoleData = [
+            'name' => 'client',
             'parent_id' => $id,
         ];
-        $systemTenantRole = Role::create($tenantRoleData);
-        // Default Tenant permissions
-        $systemTenantPermissions = [
+        $systemClientRole = Role::create($clientRoleData);
+        // Default Client permissions
+        $systemClientPermissions = [
             ['name' => 'manage invoice'],
             ['name' => 'show invoice'],
             ['name' => 'manage contact'],
@@ -565,8 +565,8 @@ if (!function_exists('defaultTenantCreate')) {
             ['name' => 'delete maintenance request'],
             ['name' => 'show maintenance request'],
         ];
-        $systemTenantRole->givePermissionTo($systemTenantPermissions);
-        return $systemTenantRole;
+        $systemClientRole->givePermissionTo($systemClientPermissions);
+        return $systemClientRole;
     }
 }
 
@@ -760,55 +760,57 @@ if (!function_exists('MessageReplace')) {
                 $search = ['{company_name}', '{company_email}', '{company_phone_number}', '{company_address}', '{company_currency}', '{new_user_name}', '{username}', '{password}', '{app_link}'];
                 $replace = [$settings['company_name'], $settings['company_email'], $settings['company_phone'], $settings['company_address'], $settings['CURRENCY_SYMBOL'], $user->name, $user->email, $notification['password'],env('APP_URL')];
             }
-            if ($notification->module == 'tenant_create') {
+            if ($notification->module == 'client_create') {
                 $user = User::find($id);
-                $search = ['{company_name}', '{company_email}', '{company_phone_number}', '{company_address}', '{company_currency}', '{user_name}', '{username}', '{password}', '{app_link}'];
-                $replace = [$settings['company_name'], $settings['company_email'], $settings['company_phone'], $settings['company_address'], $settings['CURRENCY_SYMBOL'], $user->name,$user->email, $notification['password'],env('APP_URL')];
+                $client = Client::where('user_id', $id)->first();
+                $search = ['{company_name}', '{company_email}', '{company_phone_number}', '{company_address}', '{company_currency}', '{user_name}', '{username}', '{password}', '{app_link}', '{booking_start_date}', '{booking_end_date}'];
+                $replace = [$settings['company_name'], $settings['company_email'], $settings['company_phone'], $settings['company_address'], $settings['CURRENCY_SYMBOL'], $user->name,$user->email, $notification['password'],env('APP_URL'), $client->booking_start_date, $client->booking_end_date];
             }
             if ($notification->module == 'maintainer_create') {
                 $user = User::find($id);
-                $search = ['{company_name}', '{company_email}', '{company_phone_number}', '{company_address}', '{company_currency}', '{user_name}', '{username}', '{password}', '{app_link}'];
-                $replace = [$settings['company_name'], $settings['company_email'], $settings['company_phone'], $settings['company_address'], $settings['CURRENCY_SYMBOL'], $user->name,$user->email, $notification['password'],env('APP_URL')];
+                 // Maintainers might not have booking dates, so we use empty strings or a relevant placeholder if applicable
+                $search = ['{company_name}', '{company_email}', '{company_phone_number}', '{company_address}', '{company_currency}', '{user_name}', '{username}', '{password}', '{app_link}', '{booking_start_date}', '{booking_end_date}'];
+                $replace = [$settings['company_name'], $settings['company_email'], $settings['company_phone'], $settings['company_address'], $settings['CURRENCY_SYMBOL'], $user->name,$user->email, $notification['password'],env('APP_URL'), '', ''];
             }
             if ($notification->module == 'maintenance_request_create') {
                 $user_name = User::where('id', $notification->user_id)->first();
                 $MaintenanceRequest = MaintenanceRequest::find($id);
                 $issue_type = $MaintenanceRequest->types->title;
-                $tenamt_name = !empty($MaintenanceRequest->tenetData()->user->name) ? $MaintenanceRequest->tenetData()->user->name : '';
-                $tenamt_number = !empty($MaintenanceRequest->tenetData()->user->phone_number) ? $MaintenanceRequest->tenetData()->user->phone_number : '';
-                $tenamt_mail = !empty($MaintenanceRequest->tenetData()->user->email) ? $MaintenanceRequest->tenetData()->user->email : '';
-                $search = ['{company_name}', '{company_email}', '{company_phone_number}', '{company_address}', '{company_currency}', '{tenant_name}', '{created_at}', '{issue_type}', '{issue_description}', '{tenant_number}', '{tenant_mail}'];
-                $replace = [$settings['company_name'], $settings['company_email'], $settings['company_phone'], $settings['company_address'], $settings['CURRENCY_SYMBOL'], $user_name->first_name, $MaintenanceRequest->created_at, $issue_type, $MaintenanceRequest->notes, $tenamt_number, $user_name->email];
+                $client_name_var = !empty($MaintenanceRequest->tenetData()->user->name) ? $MaintenanceRequest->tenetData()->user->name : ''; // Renamed to avoid conflict
+                $client_number = !empty($MaintenanceRequest->tenetData()->user->phone_number) ? $MaintenanceRequest->tenetData()->user->phone_number : '';
+                $client_mail = !empty($MaintenanceRequest->tenetData()->user->email) ? $MaintenanceRequest->tenetData()->user->email : '';
+                $search = ['{company_name}', '{company_email}', '{company_phone_number}', '{company_address}', '{company_currency}', '{client_name}', '{created_at}', '{issue_type}', '{issue_description}', '{client_number}', '{client_mail}'];
+                $replace = [$settings['company_name'], $settings['company_email'], $settings['company_phone'], $settings['company_address'], $settings['CURRENCY_SYMBOL'], $user_name->first_name, $MaintenanceRequest->created_at, $issue_type, $MaintenanceRequest->notes, $client_number, $user_name->email];
             }
             if ($notification->module == 'maintenance_request_complete') {
                 $MaintenanceRequest = MaintenanceRequest::find($id);
                 $issue_type = $MaintenanceRequest->types->title;
-                $tenamt_name = !empty($MaintenanceRequest->tenetData()->user->name) ? $MaintenanceRequest->tenetData()->user->name : '';
-                $tenamt_number = !empty($MaintenanceRequest->tenetData()->user->phone_number) ? $MaintenanceRequest->tenetData()->user->phone_number : '';
-                $tenamt_mail = !empty($MaintenanceRequest->tenetData()->user->email) ? $MaintenanceRequest->tenetData()->user->email : '';
+                $client_name_var = !empty($MaintenanceRequest->tenetData()->user->name) ? $MaintenanceRequest->tenetData()->user->name : ''; // Renamed to avoid conflict
+                $client_number = !empty($MaintenanceRequest->tenetData()->user->phone_number) ? $MaintenanceRequest->tenetData()->user->phone_number : '';
+                $client_mail = !empty($MaintenanceRequest->tenetData()->user->email) ? $MaintenanceRequest->tenetData()->user->email : '';
                 $maintainer_email = !empty($MaintenanceRequest->maintainers->email) ? $MaintenanceRequest->maintainers->email : '';
                 $maintainer_number = !empty($MaintenanceRequest->maintainers->phone_number) ? $MaintenanceRequest->maintainers->phone_number : '';
                 $maintainers_name = !empty($MaintenanceRequest->maintainers->name) ? $MaintenanceRequest->maintainers->name : '';
-                $search = ['{company_name}', '{company_email}', '{company_phone_number}', '{company_address}', '{company_currency}', '{tenant_name}', '{submitted_at}', '{issue_type}', '{issue_description}', '{completed_at}', '{maintainer_email}', '{maintainer_number}', '{maintainer_name}'];
-                $replace = [$settings['company_name'], $settings['company_email'], $settings['company_phone'], $settings['company_address'], $settings['CURRENCY_SYMBOL'], $tenamt_name, $MaintenanceRequest->created_at, $issue_type, $MaintenanceRequest->notes, $MaintenanceRequest->updated_at, $maintainer_email, $maintainer_number, $maintainers_name];
+                $search = ['{company_name}', '{company_email}', '{company_phone_number}', '{company_address}', '{company_currency}', '{client_name}', '{submitted_at}', '{issue_type}', '{issue_description}', '{completed_at}', '{maintainer_email}', '{maintainer_number}', '{maintainer_name}'];
+                $replace = [$settings['company_name'], $settings['company_email'], $settings['company_phone'], $settings['company_address'], $settings['CURRENCY_SYMBOL'], $client_name_var, $MaintenanceRequest->created_at, $issue_type, $MaintenanceRequest->notes, $MaintenanceRequest->updated_at, $maintainer_email, $maintainer_number, $maintainers_name];
             }
             if ($notification->module == 'invoice_create') {
                 $invoice = Invoice::find($id);
-                $user_name = $invoice->tenants()->user->name;
+                $user_name = $invoice->clients()->user->name;
                 $invoice_number = invoicePrefix() . $invoice->invoice_id;
                 $search = ['{company_name}', '{company_email}', '{company_phone_number}', '{company_address}', '{company_currency}', '{user_name}', '{invoice_number}', '{invoice_date}', '{invoice_due_date}', '{invoice_description}', '{amount}'];
                 $replace = [$settings['company_name'], $settings['company_email'], $settings['company_phone'], $settings['company_address'], $settings['CURRENCY_SYMBOL'], $user_name, $invoice_number, $invoice->created_at, $invoice->end_date, $invoice->notes, priceFormat($invoice->getInvoiceDueAmount())];
             }
-            if ($notification->module == 'invoice_create') {
+            if ($notification->module == 'invoice_create') { // This seems to be a duplicate block, will update both
                 $invoice = Invoice::find($id);
-                $user_name = $invoice->tenants()->user->name;
+                $user_name = $invoice->clients()->user->name;
                 $invoice_number = invoicePrefix() . $invoice->invoice_id;
                 $search = ['{company_name}', '{company_email}', '{company_phone_number}', '{company_address}', '{company_currency}', '{user_name}', '{invoice_number}', '{invoice_date}', '{invoice_due_date}', '{invoice_description}', '{amount}'];
                 $replace = [$settings['company_name'], $settings['company_email'], $settings['company_phone'], $settings['company_address'], $settings['CURRENCY_SYMBOL'], $user_name, $invoice_number, $invoice->created_at, $invoice->end_date, $invoice->notes, priceFormat($invoice->getInvoiceDueAmount())];
             }
             if ($notification->module == 'payment_reminder') {
                 $invoice = Invoice::find($id);
-                $user_name = $invoice->tenants()->user->name;
+                $user_name = $invoice->clients()->user->name;
                 $invoice_number = invoicePrefix() . $invoice->invoice_id;
                 $search = ['{company_name}', '{company_email}', '{company_phone_number}', '{company_address}', '{company_currency}', '{user_name}', '{invoice_number}', '{invoice_date}', '{invoice_due_date}', '{amount}', '{invoice_description}'];
                 $replace = [$settings['company_name'], $settings['company_email'], $settings['company_phone'], $settings['company_address'], $settings['CURRENCY_SYMBOL'], $user_name, $invoice_number, $invoice->created_at, $invoice->end_date, priceFormat($invoice->getInvoiceDueAmount()), $invoice->notes];
@@ -835,42 +837,42 @@ if (!function_exists('defultTemplate')) {
                 'templete' => '
                             <p><strong>Dear {new_user_name}</strong>,</p><p>&nbsp;</p><blockquote><p>Welcome We are excited to have you on board and look forward to providing you with an exceptional experience.</p><p>We hope you enjoy your experience with us. If you have any feedback, feel free to share it with us.</p><p>&nbsp;</p><p>Your account details are as follows:</p><p><strong>App Link:</strong> <a href="{app_link}">{app_link}</a></p><p><strong>Username:</strong> {username}</p><p><strong>Password:</strong> {password}</p><p>&nbsp;</p><p>Thank you for choosing {company_name}!</p></blockquote>',
             ],
-            'tenant_create' =>
+            'client_create' => // Renamed tenant_create to client_create
             [
-                'module' => 'tenant_create',
-                'name' => 'New Tenant',
-                'short_code' => ['{company_name}', '{company_email}', '{company_phone_number}', '{company_address}', '{company_currency}', '{user_name}', '{username}', '{password}', '{app_link}'],
+                'module' => 'client_create', // Renamed tenant_create to client_create
+                'name' => 'New Client', // Renamed New Tenant to New Client
+                'short_code' => ['{company_name}', '{company_email}', '{company_phone_number}', '{company_address}', '{company_currency}', '{user_name}', '{username}', '{password}', '{app_link}', '{booking_start_date}', '{booking_end_date}'],
                 'subject' => 'Welcome to {company_name}!',
                 'templete' => '
-                  <p><strong>Dear {user_name}</strong>,</p><p>&nbsp;</p><blockquote><p>Welcome We are excited to have you on board and look forward to providing you with an exceptional experience.</p><p>We hope you enjoy your experience with us. If you have any feedback, feel free to share it with us.</p><p>&nbsp;</p><p>Your account details are as follows:</p><p><strong>App Link:</strong> <a href="{app_link}">{app_link}</a></p><p><strong>Username:</strong> {username}</p><p><strong>Password:</strong> {password}</p><p>&nbsp;</p><p>Thank you for choosing {company_name}!</p></blockquote>',
+                  <p><strong>Dear {user_name}</strong>,</p><p>&nbsp;</p><blockquote><p>Welcome We are excited to have you on board and look forward to providing you with an exceptional experience.</p><p>We hope you enjoy your experience with us. If you have any feedback, feel free to share it with us.</p><p>&nbsp;</p><p>Your account details are as follows:</p><p><strong>App Link:</strong> <a href="{app_link}">{app_link}</a></p><p><strong>Username:</strong> {username}</p><p><strong>Password:</strong> {password}</p><p><strong>Booking Start Date:</strong> {booking_start_date}</p><p><strong>Booking End Date:</strong> {booking_end_date}</p><p>&nbsp;</p><p>Thank you for choosing {company_name}!</p></blockquote>',
             ],
             'maintainer_create' =>
             [
                 'module' => 'maintainer_create',
                 'name' => 'New Maintainer',
-                'short_code' => ['{company_name}', '{company_email}', '{company_phone_number}', '{company_address}', '{company_currency}', '{user_name}', '{username}', '{password}', '{app_link}'],
+                'short_code' => ['{company_name}', '{company_email}', '{company_phone_number}', '{company_address}', '{company_currency}', '{user_name}', '{username}', '{password}', '{app_link}', '{booking_start_date}', '{booking_end_date}'],
                 'subject' => 'Welcome to {company_name}!',
                 'templete' => '
-                  <p><strong>Dear {user_name}</strong>,</p><p>&nbsp;</p><blockquote><p>Welcome We are excited to have you on board and look forward to providing you with an exceptional experience.</p><p>We hope you enjoy your experience with us. If you have any feedback, feel free to share it with us.</p><p>&nbsp;</p><p>Your account details are as follows:</p><p><strong>App Link:</strong> <a href="{app_link}">{app_link}</a></p><p><strong>Username:</strong> {username}</p><p><strong>Password:</strong> {password}</p><p>&nbsp;</p><p>Thank you for choosing {company_name}!</p></blockquote>',
+                  <p><strong>Dear {user_name}</strong>,</p><p>&nbsp;</p><blockquote><p>Welcome We are excited to have you on board and look forward to providing you with an exceptional experience.</p><p>We hope you enjoy your experience with us. If you have any feedback, feel free to share it with us.</p><p>&nbsp;</p><p>Your account details are as follows:</p><p><strong>App Link:</strong> <a href="{app_link}">{app_link}</a></p><p><strong>Username:</strong> {username}</p><p><strong>Password:</strong> {password}</p><p>&nbsp;</p><p>Thank you for choosing {company_name}!</p></blockquote>', // Note: booking_start_date and booking_end_date might not be relevant here or should be handled if they are.
             ],
             'maintenance_request_create' =>
             [
                 'module' => 'maintenance_request_create',
                 'name' => 'New Maintenance Request',
-                'short_code' => ['{company_name}', '{company_email}', '{company_phone_number}', '{company_address}', '{company_currency}', '{tenant_name}', '{created_at}', '{issue_type}', '{issue_description}', '{tenant_number}', '{tenant_mail}'],
+                'short_code' => ['{company_name}', '{company_email}', '{company_phone_number}', '{company_address}', '{company_currency}', '{client_name}', '{created_at}', '{issue_type}', '{issue_description}', '{client_number}', '{client_mail}'],
                 'subject' => 'New Maintenance Request Created',
                 'templete' => '
-                    <p><strong class="ql-size-huge">Dear Owner,</strong></p><p>We would like to inform you that a new maintenance request has been created for your property. Below are the details of the request:</p><p><strong>Request Details:</strong></p><ul><li>	Submitted By: {tenant_name}</li><li>	Submitted On: {created_at}</li><li>	Category: {issue_type}</li><li>	Description: {issue_description}</li></ul><p><br></p><p><strong>Tenant Contact Information:</strong></p><ul><li>	Name: {tenant_name}</li><li>	Phone: {tenant_number}</li><li>	Email: {tenant_mail}</li></ul><p>Thank you for your attention to this matter.</p><p><strong>Best regards,</strong></p><p><strong>{tenant_name}</strong></p><p><strong>{tenant_mail}</strong></p>
+                    <p><strong class="ql-size-huge">Dear Owner,</strong></p><p>We would like to inform you that a new maintenance request has been created for your property. Below are the details of the request:</p><p><strong>Request Details:</strong></p><ul><li>	Submitted By: {client_name}</li><li>	Submitted On: {created_at}</li><li>	Category: {issue_type}</li><li>	Description: {issue_description}</li></ul><p><br></p><p><strong>Client Contact Information:</strong></p><ul><li>	Name: {client_name}</li><li>	Phone: {client_number}</li><li>	Email: {client_mail}</li></ul><p>Thank you for your attention to this matter.</p><p><strong>Best regards,</strong></p><p><strong>{client_name}</strong></p><p><strong>{client_mail}</strong></p>
                 ',
             ],
             'maintenance_request_complete' =>
             [
                 'module' => 'maintenance_request_complete',
                 'name' => 'Maintenance Request Complete',
-                'short_code' => ['{company_name}', '{company_email}', '{company_phone_number}', '{company_address}', '{company_currency}', '{tenant_name}', '{submitted_at}', '{issue_type}', '{issue_description}', '{completed_at}', '{maintainer_email}', '{maintainer_number}', '{maintainer_name}'],
+                'short_code' => ['{company_name}', '{company_email}', '{company_phone_number}', '{company_address}', '{company_currency}', '{client_name}', '{submitted_at}', '{issue_type}', '{issue_description}', '{completed_at}', '{maintainer_email}', '{maintainer_number}', '{maintainer_name}'],
                 'subject' => 'Maintenance Request Completed!',
                 'templete' => '
-                    <p><strong>Dear {tenant_name},</strong></p><p><br></p><p>We are pleased to inform you that your maintenance request has been successfully completed.</p><p><br></p><p> <strong>Request Details:</strong></p><ul><li>Submitted By: {tenant_name}</li><li>Submitted On: {submitted_at}</li><li>Category: {issue_type}</li><li>Description: {issue_description}</li></ul><p><br></p><p><strong>Completion Details:</strong></p><ul><li> Completed On: {completed_at}</li> </ul><p><br></p><p><strong>Feedback:</strong></p><p>We value your feedback to improve our services. Please let us know if you are satisfied with the maintenance performed or if there are any further issues that need attention.</p><p><br></p><p><strong>Contact Information:</strong></p><p> If you have any questions or need further assistance, please contact us at {maintainer_email} or {maintainer_number}.</p><p>Thank you for your cooperation and patience.</p><p><br></p><p><strong>Best regards,</strong></p><p>{maintainer_name}</p><p>{maintainer_email}</p>
+                    <p><strong>Dear {client_name},</strong></p><p><br></p><p>We are pleased to inform you that your maintenance request has been successfully completed.</p><p><br></p><p> <strong>Request Details:</strong></p><ul><li>Submitted By: {client_name}</li><li>Submitted On: {submitted_at}</li><li>Category: {issue_type}</li><li>Description: {issue_description}</li></ul><p><br></p><p><strong>Completion Details:</strong></p><ul><li> Completed On: {completed_at}</li> </ul><p><br></p><p><strong>Feedback:</strong></p><p>We value your feedback to improve our services. Please let us know if you are satisfied with the maintenance performed or if there are any further issues that need attention.</p><p><br></p><p><strong>Contact Information:</strong></p><p> If you have any questions or need further assistance, please contact us at {maintainer_email} or {maintainer_number}.</p><p>Thank you for your cooperation and patience.</p><p><br></p><p><strong>Best regards,</strong></p><p>{maintainer_name}</p><p>{maintainer_email}</p>
                 ',
             ],
             'invoice_create' =>
